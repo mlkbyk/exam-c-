@@ -1,71 +1,79 @@
 #include <iostream>
-using namespace std;
 
 class class1 {
 public:
-    int dim_a; // Vector size
-    float *A;  // Dynamic vector pointer
+    int dim_a;    // Vektörün boyutu
+    double *A;    // Dinamik olarak oluşturulan double tipi dizi
 
-    // Constructor
+    // Constructor: dim_a boyutunda bir dizi oluşturur
     class1(int a) {
-        dim_a = a; 
-        A = new float[dim_a];
-        for (int i = 0; i < dim_a; i++) {
-            A[i] = 0.0; // Initialize vector elements to 0
-        }
+        dim_a = a;
+        A = new double[dim_a];
     }
 
-    // Destructor
-    ~class1() { 
-        delete[] A; 
+    // Destructor: Dinamik belleği serbest bırakır
+    ~class1() {
+        delete[] A;
     }
 
-    // Assignment Operator Overloading
-    class1& operator=(const class1 &ob1) {
-        // Self-assignment check
-        if (this == &ob1) {
-            return *this;
-        }
+    // Atama operatörünün bildirimi
+    class1& operator=(const class1 &object_1);
 
-        // If sizes are different, reallocate memory
-        if (dim_a != ob1.dim_a) {
-            delete[] A;           // Free old memory
-            dim_a = ob1.dim_a;    // Update size
-            A = new float[dim_a]; // Allocate new memory
-        }
-
-        // Copy elements
+    // Elemanları yazdırmak için bir yardımcı fonksiyon
+    void print() const {
         for (int i = 0; i < dim_a; i++) {
-            A[i] = ob1.A[i];
+            std::cout << A[i] << " ";
         }
-
-        return *this; // Return the current object
-    }
-
-    // Display Function (To Show Vector Elements)
-    void display() {
-        cout << "Vector: ";
-        for (int i = 0; i < dim_a; i++) {
-            cout << A[i] << " ";
-        }
-        cout << endl;
+        std::cout << std::endl;
     }
 };
 
-int main() {
-    class1 obj1(5); // Create an object with size 5
-    for (int i = 0; i < 5; i++) {
-        obj1.A[i] = i * 2; // Initialize obj1 vector
+// Atama operatörünün tanımı
+class1& class1::operator=(const class1 &object_1) {
+    // Self-assignment kontrolü
+    if (this == &object_1) {
+        return *this;
     }
 
-    class1 obj2(3); // Create another object with size 3
-    obj2 = obj1;    // Use assignment operator
+    // Eğer boyutlar farklıysa eski belleği serbest bırak ve yeni boyutta bellek tahsis et
+    if (this->dim_a != object_1.dim_a) {
+        delete[] this->A;               // Eski belleği serbest bırak
+        this->dim_a = object_1.dim_a;   // Yeni boyutu kopyala
+        this->A = new double[this->dim_a]; // Yeni bellek tahsis et
+    }
 
-    cout << "Object 1: ";
-    obj1.display();
+    // Döngü ile elemanları kopyala
+    for (int i = 0; i < this->dim_a; i++) {
+        this->A[i] = object_1.A[i];
+    }
 
-    cout << "Object 2: ";
-    obj2.display();
+    return *this; // Zincirleme atama için referans döndür
+}
+
+int main() {
+    // İki nesne oluştur
+    class1 obj1(5); // 5 elemanlı bir dizi
+    class1 obj2(3); // 3 elemanlı bir dizi
+
+    // obj1'i doldur
+    for (int i = 0; i < 5; i++) {
+        obj1.A[i] = i + 1; // [1, 2, 3, 4, 5]
+    }
+
+    // obj2'yi doldur
+    for (int i = 0; i < 3; i++) {
+        obj2.A[i] = (i + 1) * 10; // [10, 20, 30]
+    }
+
+    // obj1'i obj2'ye ata
+    obj2 = obj1;
+
+    // Sonuçları yazdır
+    std::cout << "obj1: ";
+    obj1.print();
+
+    std::cout << "obj2: ";
+    obj2.print();
 
     return 0;
 }
